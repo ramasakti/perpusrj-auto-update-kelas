@@ -1,7 +1,5 @@
 <?php
-require 'vendor/autoload.php';
-
-use PhpOffice\PhpSpreadsheet\IOFactory;
+require 'PHPExcel/Classes/PHPExcel.php'; // Pastikan jalur ke file PHPExcel.php benar
 
 // Koneksi ke database
 $host = 'localhost';
@@ -32,8 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file'])) {
         move_uploaded_file($file['tmp_name'], $filePath);
 
         // Membaca file Excel
-        $spreadsheet = IOFactory::load($filePath);
-        $sheet = $spreadsheet->getActiveSheet();
+        $inputFileType = PHPExcel_IOFactory::identify($filePath);
+        $objReader = PHPExcel_IOFactory::createReader($inputFileType);
+        $objPHPExcel = $objReader->load($filePath);
+        $sheet = $objPHPExcel->getActiveSheet();
         $data = $sheet->toArray();
 
         // Mulai dari baris kedua untuk melewati header
