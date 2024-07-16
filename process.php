@@ -1,6 +1,4 @@
 <?php
-require __DIR__ . '\PHPExcel\Classes\PHPExcel.php'; // Pastikan jalur ke file PHPExcel.php benar
-
 // Koneksi ke database
 $host = 'localhost';
 $db = 'linspro';
@@ -29,30 +27,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file'])) {
         $filePath = 'uploads/' . basename($file['name']);
         move_uploaded_file($file['tmp_name'], $filePath);
 
-        // Membaca file Excel
-        $inputFileType = PHPExcel_IOFactory::identify($filePath);
-        $objReader = PHPExcel_IOFactory::createReader($inputFileType);
-        $objPHPExcel = $objReader->load($filePath);
-        $sheet = $objPHPExcel->getActiveSheet();
-        $data = $sheet->toArray();
+        // Membaca file CSV
+        if (($handle = fopen($filePath, "r")) !== FALSE) {
+            // Lewati baris pertama (header)
+            fgetcsv($handle, 1000, ",");
 
-        // Mulai dari baris kedua untuk melewati header
-        foreach ($data as $index => $row) {
-            if ($index == 0) {
-                continue; // Lewati baris header
+            // Baca setiap baris data
+            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                $nama = $data[0];
+                $organisasi = $data[1];
+                $kojur = $data[1];
+                $no_anggota = $data[2];
+                $tempat_lahir = $data[3];
+                $tanggal_lahir = $data[4];
+
+                // Update query
+                $sql = "UPDATE anggota SET Organisasi = :organisasi, Kojur = :kojur WHERE `No Anggota` = :no_anggota";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute(['organisasi' => $organisasi, 'kojur' => $kojur, 'no_anggota' => $no_anggota]);
             }
-
-            $nama = $row[0];
-            $organisasi = $row[1];
-            $kojur = $row[1];
-            $no_anggota = $row[2];
-            $tempat_lahir = $row[3];
-            $tanggal_lahir = $row[4];
-
-            // Update query
-            $sql = "UPDATE anggota SET Organisasi = :organisasi, Kojur = :kojur WHERE `No Anggota` = :no_anggota";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute(['organisasi' => $organisasi, 'kojur' => $kojur, 'no_anggota' => $no_anggota]);
+            fclose($handle);
         }
 
         echo "Update selesai!";
