@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/PHPExcel/Classes/PHPExcel.php'; // Pastikan jalur ke file PHPExcel.php benar
+require __DIR__ . '\PHPExcel\Classes\PHPExcel.php'; // Pastikan jalur ke file PHPExcel.php benar
 
 // Koneksi ke database
 $host = 'localhost';
