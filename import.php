@@ -34,9 +34,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['file'])) {
 
                 // Baca setiap baris data
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                    $no_anggota = $data[2];
+                    $no_anggota = $data[0];
                     $organisasi = $data[1];
-                    $nama = $data[0];
+                    $nama = $data[2];
                     $kojur = $data[1];
 
                     // Update query
